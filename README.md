@@ -1,5 +1,6 @@
 # manga-publisher-display
 ebookjapanなどの電子書籍サービスで出版社名を表示する
+自動取得出来なかった、間違っている場合は手動での変更も可能
 
 ・必要
 Google Books APIのAPIキー
