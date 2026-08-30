@@ -100,8 +100,235 @@ async function fetchPublisherFromAPI(searchTitle) {
   }
 }
 
+
+//表示関数を追加
+function renderPublisherLabel(parentContainer, searchTitle, publisher) {
+  let publisherEl = parentContainer.querySelector('.publisher-label');
+
+  if (!publisherEl) {
+    publisherEl = document.createElement('div');
+    publisherEl.className = 'publisher-label';
+    parentContainer.appendChild(publisherEl);
+  }
+
+  publisherEl.replaceChildren();
+
+  const textEl = document.createElement('span');
+  textEl.textContent = `出版社: ${publisher}`;
+  publisherEl.appendChild(textEl);
+
+  const editButton = document.createElement('button');
+  editButton.type = 'button';
+  editButton.textContent = '編集';
+  editButton.className = 'publisher-edit-button';
+  editButton.style.marginLeft = '8px';
+
+  editButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // 編集欄がすでに表示されている場合は何もしない
+    if (publisherEl.querySelector('.publisher-edit-input')) {
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'publisher-edit-input';
+    input.value = publisher.includes('見つかりませんでした') ||
+      publisher.includes('取得失敗') ||
+      publisher === '出版社情報なし'
+      ? ''
+      : publisher;
+    input.placeholder = '出版社名';
+
+    const saveButton = document.createElement('button');
+    saveButton.type = 'button';
+    saveButton.textContent = '保存';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.textContent = 'キャンセル';
+
+    const editorEl = document.createElement('span');
+    editorEl.className = 'publisher-editor';
+    editorEl.append(input, saveButton, cancelButton);
+
+    // 現在の表示を編集欄に置き換える
+    publisherEl.replaceChildren(editorEl);
+    input.focus();
+
+    const cancelEdit = (cancelEvent) => {
+      cancelEvent.preventDefault();
+      cancelEvent.stopPropagation();
+      renderPublisherLabel(parentContainer, searchTitle, publisher);
+    };
+
+    const saveEdit = (saveEvent) => {
+      saveEvent.preventDefault();
+      saveEvent.stopPropagation();
+
+      const newPublisher = input.value.trim();
+      if (!newPublisher) {
+        input.focus();
+        return;
+      }
+
+      chrome.storage.local.set(
+        { [searchTitle]: newPublisher },
+        () => {
+          if (chrome.runtime.lastError) {
+            console.error(
+              '出版社情報の保存に失敗しました:',
+              chrome.runtime.lastError
+            );
+            return;
+          }
+
+          renderPublisherLabel(
+            parentContainer,
+            searchTitle,
+            newPublisher
+          );
+        }
+      );
+    };
+
+    saveButton.addEventListener('click', saveEdit);
+    cancelButton.addEventListener('click', cancelEdit);
+
+    input.addEventListener('keydown', (inputEvent) => {
+      if (inputEvent.key === 'Enter') {
+        saveEdit(inputEvent);
+      } else if (inputEvent.key === 'Escape') {
+        cancelEdit(inputEvent);
+      }
+    });
+  });
+
+  publisherEl.append(' ', editButton);
+}
+function renderPublisherLabel(parentContainer, searchTitle, publisher) {
+  let publisherEl = parentContainer.querySelector('.publisher-label');
+
+  if (!publisherEl) {
+    publisherEl = document.createElement('div');
+    publisherEl.className = 'publisher-label';
+    parentContainer.appendChild(publisherEl);
+  }
+
+  publisherEl.replaceChildren();
+
+  const textEl = document.createElement('span');
+  textEl.textContent = `出版社: ${publisher}`;
+  publisherEl.appendChild(textEl);
+
+  const editButton = document.createElement('button');
+  editButton.type = 'button';
+  editButton.textContent = '編集';
+  editButton.className = 'publisher-edit-button';
+  editButton.style.marginLeft = '8px';
+
+  editButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // 編集欄がすでに表示されている場合は何もしない
+    if (publisherEl.querySelector('.publisher-edit-input')) {
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'publisher-edit-input';
+    input.value = publisher.includes('見つかりませんでした') ||
+      publisher.includes('取得失敗') ||
+      publisher === '出版社情報なし'
+      ? ''
+      : publisher;
+    input.placeholder = '出版社名';
+
+    const saveButton = document.createElement('button');
+    saveButton.type = 'button';
+    saveButton.textContent = '保存';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.textContent = 'キャンセル';
+
+    const editorEl = document.createElement('span');
+    editorEl.className = 'publisher-editor';
+    editorEl.append(input, saveButton, cancelButton);
+
+    // 現在の表示を編集欄に置き換える
+    publisherEl.replaceChildren(editorEl);
+    input.focus();
+
+    const cancelEdit = (cancelEvent) => {
+      cancelEvent.preventDefault();
+      cancelEvent.stopPropagation();
+      renderPublisherLabel(parentContainer, searchTitle, publisher);
+    };
+
+    const saveEdit = (saveEvent) => {
+      saveEvent.preventDefault();
+      saveEvent.stopPropagation();
+
+      const newPublisher = input.value.trim();
+      if (!newPublisher) {
+        input.focus();
+        return;
+      }
+
+      chrome.storage.local.set(
+        { [searchTitle]: newPublisher },
+        () => {
+          if (chrome.runtime.lastError) {
+            console.error(
+              '出版社情報の保存に失敗しました:',
+              chrome.runtime.lastError
+            );
+            return;
+          }
+
+          renderPublisherLabel(
+            parentContainer,
+            searchTitle,
+            newPublisher
+          );
+        }
+      );
+    };
+
+    saveButton.addEventListener('click', saveEdit);
+    cancelButton.addEventListener('click', cancelEdit);
+
+    input.addEventListener('keydown', (inputEvent) => {
+      if (inputEvent.key === 'Enter') {
+        saveEdit(inputEvent);
+      } else if (inputEvent.key === 'Escape') {
+        cancelEdit(inputEvent);
+      }
+    });
+  });
+
+  publisherEl.append(' ', editButton);
+}
+
+//content.jsにも実行制限を追加(if (!isCartPage()),
+function isCartPage() {
+  return location.origin === 'https://ebookjapan.yahoo.co.jp' &&
+    /^\/cart\/?$/.test(location.pathname );
+}
+
+
 // 画面内の全タイトル要素を処理する関数
 function processAllBookTitles() {
+
+  if (!isCartPage()) {
+    return;
+  }
+
   const titleElements = document.querySelectorAll('.book-caption__title');
 
   titleElements.forEach((titleEl) => {
@@ -132,19 +359,10 @@ function processAllBookTitles() {
 	) {
 	  chrome.storage.local.set({ [searchTitle]: publisher });
 	}
-// 取得成功時のみキャッシュに保存
-//        if (publisher !== '取得失敗（制限または通信エラー）') {
-//          chrome.storage.local.set({ [searchTitle]: publisher });
-//        }
       }
 
       // 画面内に重複タグがないか最終確認して表示
-      if (!parentContainer.querySelector('.publisher-label')) {
-        const publisherEl = document.createElement('div');
-        publisherEl.className = 'publisher-label';
-        publisherEl.textContent = `出版社: ${publisher}`;
-        parentContainer.appendChild(publisherEl);
-      }
+	renderPublisherLabel(parentContainer, searchTitle, publisher);
 
       // 完了ステータスに変更
       titleEl.dataset.publisherStatus = 'done';
@@ -158,6 +376,9 @@ processAllBookTitles();
 // 画面の変化を監視（デバウンス処理で連続実行を抑制）
 let timerId = null;
 const observer = new MutationObserver(() => {
+  if (!isCartPage()) {
+    return;
+  }
   if (timerId) clearTimeout(timerId);
   // 画面の変化が落ち着いてから0.5秒後に1回だけ実行
   timerId = setTimeout(() => {
