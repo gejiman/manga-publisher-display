@@ -1,0 +1,12 @@
+/* 追加される出版社タグのスタイリング */
+.publisher-label {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2c3e50;
+  background-color: #e8f4f8;
+  border: 1px solid #bce8f1;
+  border-radius: 4px;
+}

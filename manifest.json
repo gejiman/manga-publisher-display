@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "漫画出版社自動表示ツール",
+  "version": "1.0",
+  "description": "カート内の漫画タイトルからGoogle Books APIを用いて出版社を取得・表示します。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://ebookjapan.yahoo.co.jp/cart/"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
