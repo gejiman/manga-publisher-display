@@ -1,5 +1,30 @@
 const GOOGLE_BOOKS_API_KEY = '';
 
+
+//サイトごとに判定
+const SITE_CONFIGS = [
+  {
+    origin: 'https://ebookjapan.yahoo.co.jp',
+    path: /^\/cart\/?$/,
+    titleSelector: '.book-caption__title',
+    publisherParentSelector: '.book-caption'
+  },
+  {
+    origin: 'https://booklive.jp',
+    path: /^\/cart\/?$/,
+    titleSelector: 'p.book_name',
+    publisherParentSelector: '.text'
+  }
+];
+
+function getSiteConfig( ) {
+  return SITE_CONFIGS.find((config) =>
+    location.origin === config.origin &&
+    config.path.test(location.pathname)
+  ) || null;
+}
+
+
 // Google Books APIから出版社名を取得する関数
 	//検索用タイトルを正規化
 	function normalizeBookTitle(rawTitle) {
@@ -324,12 +349,16 @@ function isCartPage() {
 
 // 画面内の全タイトル要素を処理する関数
 function processAllBookTitles() {
+  const siteConfig = getSiteConfig();
 
-  if (!isCartPage()) {
+  if (!siteConfig) {
     return;
   }
 
-  const titleElements = document.querySelectorAll('.book-caption__title');
+  const titleElements = document.querySelectorAll(
+    siteConfig.titleSelector
+  );
+
 
   titleElements.forEach((titleEl) => {
     // すでに処理中または処理済みの場合は即座にスキップ（二重実行を防止）
@@ -341,8 +370,9 @@ function processAllBookTitles() {
     // 即座に処理中フラグを立てて後続の重複処理をブロック
     titleEl.dataset.publisherStatus = 'processing';
 	const searchTitle = normalizeBookTitle(rawTitle);
-	//    const searchTitle = rawTitle.replace(/\(.*?\)|（.*?）|【.*?】/g, '').trim();
-    const parentContainer = titleEl.closest('.book-caption') || titleEl.parentElement;
+	const parentContainer =
+  	titleEl.closest(siteConfig.publisherParentSelector) ||
+ 	 titleEl.parentElement;
 
     // ローカルストレージ（キャッシュ）を確認
     chrome.storage.local.get([searchTitle], async (result) => {

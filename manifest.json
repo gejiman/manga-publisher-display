@@ -11,7 +11,8 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://ebookjapan.yahoo.co.jp/cart/"],
+      "matches": ["https://ebookjapan.yahoo.co.jp/cart/*",
+	"https://booklive.jp/cart/*"],
       "js": ["content.js"],
       "css": ["style.css"]
     }
